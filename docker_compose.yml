@@ -1,0 +1,40 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./OdourCollect_2.0_frontend
+      dockerfile: Dockerfile-dev
+    ports:
+      - "80:4200"
+    container_name: frontend
+    volumes:
+       - ./OdourCollect_2.0_frontend:/usr/src/app/app-ui
+       - /usr/src/app/app-ui/node_modules
+  mariadb:
+    image: docker.io/bitnami/mariadb:10.6
+    ports:
+      - "3306:3306"
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=odourcollect
+      - MARIADB_DATABASE=odourcollect
+  backend:
+    image: docker.io/bitnami/laravel:10
+    ports:
+      - '8000:8000'
+    environment:
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_USERNAME=odourcollect
+      - DB_DATABASE=odourcollect
+    volumes:
+      - './OdourCollect_2.0_backend:/app'
+    depends_on:
+      - mariadb
+    container_name: backend
+  temp_composer:
+    image: composer
+    volumes:
+        - './OdourCollect_2.0_backend:/app'
+    command: install
