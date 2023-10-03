@@ -14,5 +14,6 @@ do
     else
         echo "Migrations did not run successfully, will retry one more time"
 fi
+done
 
 
